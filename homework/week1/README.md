@@ -80,3 +80,6 @@ Method 1 built-in  >  Method 2b / Method 3 linear  >>>  Method 2a exponential (f
 - Built-in operators are usually highly optimized — use them when you can.
 - Memoization (a lookup table) can rescue a repeated exponential recursion back to
   linear, but it only helps when there is repeated work to cache.
+
+## Agent Use
+Claude Code (LLM model: qwen3.8)
