@@ -115,3 +115,7 @@ that it still computes the verdict but skips dumping every row.
 | `sat_solver.py` | The solver (Python standard library only). |
 | `example.cnf`   | A small satisfiable DIMACS sample.         |
 | `README.md`     | This document.                             |
+
+
+## Agent Use
+Claude Code (LLM model: qwen3.8)
