@@ -127,7 +127,9 @@ dramatically once it's small.
 | Work per step | 1 cosine | 1 cosine + 1 sine + a division |
 
 The trade-off: Newton does a bit more work per step and needs the derivative of
-`f`, but it needs far fewer steps.
+`f`, but it needs far fewer steps. It is also less forgiving: plain `cos(x)`
+works from any start, but Newton breaks down wherever the derivative
+`1 + sin x` is 0 (for example `x = −π/2`), because it would divide by zero.
 
 ### How the code works
 
@@ -138,6 +140,10 @@ there is nothing to install.
   `x = g(x)` until the change is smaller than `tol` (default `1e-12`), and
   returns the answer plus the number of steps. If the guesses still haven't
   settled after `max_iter` steps, it raises an error instead of running forever.
+  It also raises a clear error if the update rule divides by zero. Newton's
+  rule does that at `x = −π/2` (plus any multiple of `2π`), where the
+  derivative `1 + sin x` is `0` and the tangent line is flat. The default start
+  `x₀ = 1` never gets there.
 - `fixed` and `newton` are the two update rules, each one line long.
 - The main block runs both methods, prints the first 10 steps of each so you
   can watch them converge, and then **checks** each answer with
@@ -195,9 +201,9 @@ where it can go wrong.
 
 ## 4. Supplement: the 2024 Nobel Prize in Physics
 
-`iter_nobel_nn.py` is reading material from class. It uses the same
-`generic_iterator` for the two neural-network memory models behind the 2024
-Nobel Prize in Physics:
+`iter_nobel_nn.py` is reading material from class. It has its own copy of
+`generic_iterator` (without the timeout warning) and applies it to the two
+neural-network memory models behind the 2024 Nobel Prize in Physics:
 
 - **Hopfield network:** repairs a damaged pattern by updating it until it
   stops changing (a fixed point, just like in section 1).

@@ -10,7 +10,10 @@ import math
 def iterate(g, x0, tol=1e-12, max_iter=1000, show=10):
     x = x0
     for i in range(1, max_iter + 1):
-        x_new = g(x)
+        try:
+            x_new = g(x)
+        except ZeroDivisionError:  # e.g. Newton at x = -pi/2, where 1 + sin(x) = 0
+            raise RuntimeError(f'update rule divided by zero at x = {x}') from None
         if i <= show:
             print(f'  {i:3d}  x = {x_new:.12f}  |dx| = {abs(x_new - x):.2e}')
         if abs(x_new - x) < tol:

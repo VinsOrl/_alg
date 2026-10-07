@@ -94,9 +94,12 @@ A pair: `(final_state, number_of_steps)`.
   answer can take a tiny step while still being noticeably off. For
   fast-converging methods (most of the ones here) this isn't a problem, but it's
   worth knowing.
-- **A small quirk on timeout.** If the limit is hit, the function returns the
-  guess from the previous round and discards the one it just computed. This
-  only matters when something has already gone wrong.
+- **A timeout looks like a success.** If the limit is hit, the function prints
+  a warning and returns `(last_guess, 1000)`. That has the same shape as a
+  normal result, so every demo would still print `結果: ...` as if it had
+  converged. The only sign of trouble is the warning line and a step count of
+  exactly 1000. A stricter version would `raise` an error instead, as
+  `cos_fixed_point.py` does.
 
 ---
 
@@ -218,7 +221,11 @@ gap between the largest and second-largest eigenvalue, the faster this happens.
 
 **Watch out.** If the largest eigenvalue were negative, the vector would flip
 direction every step and the stopping rule would never say "done". This
-matrix's eigenvalues are all positive, so that doesn't happen here.
+matrix's eigenvalues are all positive, so that doesn't happen here. A
+sign-proof stopping rule would compare directions instead:
+`1 - abs(old @ new) < 1e-12`. Also, the update line computes `A·v` twice
+(once for the vector and once for its length); computing it once into a
+variable halves the work.
 
 **Result.** Largest eigenvalue `4.721570` after 17 steps.
 
@@ -345,7 +352,11 @@ the points into groups, so it must settle eventually.
   starting centres can give different results.
 - If a centre ends up with no points at all, the average of zero points is
   `NaN` ("not a number"). The loop can never finish after that. It doesn't happen
-  with this data, but a real program should handle it.
+  with this data, but a real program should handle it, for example by leaving
+  an empty centre where it was.
+- The starting centres `X[:2]` are both from the `(2, 2)` group, because the
+  data lists that group first. It still works here, but picking one point from
+  each end of the data (`X[[0, -1]]`) or random points is safer.
 
 **Result.** Centres at about `(−2.11, −2.13)` and `(1.83, 1.80)` after only 4
 steps, close to the true `(−2, −2)` and `(2, 2)`.
@@ -457,8 +468,26 @@ Where an exact answer is known, the program's result matches it:
 
 ## 6. Related file
 
-`iter_nobel_nn.py` reuses the same `generic_iterator` for the two neural-network
-memory models behind the 2024 Nobel Prize in Physics. The Hopfield network
-repairs a damaged pattern by updating it until it stops changing (a fixed
-point, like demo 1). The RBM's CD-k training step runs exactly `k` rounds of
-sampling (a fixed step count, like the RK4 demo).
+`iter_nobel_nn.py` applies the same "guess, update, check" loop to the two
+neural-network memory models behind the 2024 Nobel Prize in Physics. The
+Hopfield network repairs a damaged pattern by updating it until it stops
+changing (a fixed point, like demo 1). The RBM's CD-k step runs exactly `k`
+rounds of sampling (a fixed step count, like the RK4 demo).
+
+Things to know about that file:
+
+- **It has its own copy of `generic_iterator`**, and the copy leaves out the
+  timeout warning. If a run hits the 1000-step limit, it returns silently and
+  looks like a success. `from iter_framework import generic_iterator` would
+  reuse the real one.
+- **The Hopfield network updates all neurons at once.** That version can get
+  stuck bouncing between two patterns forever, and then the "stopped changing"
+  rule never fires. Updating one neuron at a time always settles. The
+  demo's input happens to be repaired in 2 steps, so it isn't affected.
+- **"Weighted sum is exactly 0" is tested on decimal numbers.** The weights are
+  divided by `n`, so they are decimals such as `0.2`, and whether a sum comes
+  out as exactly `0` depends on rounding. Leaving out the `/ n` keeps the
+  weights as whole numbers. That makes the test exact and doesn't change the
+  sign of any sum.
+- **The RBM step ignores the hidden layer it receives.** It samples a new one
+  from `v` every round, so the starting `h0` is computed and then thrown away.
