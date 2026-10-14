@@ -295,7 +295,7 @@ Prints the full reduction trace for each example, then runs `assert`-based
 self-checks — including the variable-capture case from section 3 — and
 finishes with `all checks passed`.
 
-## 9. Known limitations (ponytail notes)
+## 9. Known limitations
 
 - Fixed step cap, no cycle detection — a program that genuinely needs more
   than 200 steps just needs a larger `max_steps` argument.
