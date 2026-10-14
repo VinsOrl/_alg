@@ -1,10 +1,5 @@
 # Week 6 — A Lambda Calculus Interpreter
 
-Week 5's notes introduced the notation (`λx. M`, variables, application) as
-background for hand-rolled `map`/`filter`/`reduce`. This week writes a program
-that actually *reads* that notation as source text and *runs* it, printing
-every beta-reduction step so the whole calculation process is visible.
-
 `lambda_calculus.py` is a single self-contained file: term representation,
 substitution, reducer, parser, a handful of named terms, example programs,
 and a self-check.
