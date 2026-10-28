@@ -189,3 +189,11 @@ This checks all five methods against a 4-city square where the optimal
 tour length is known exactly (`4.0`), then runs them on 20 random cities
 and prints each method's tour length next to the greedy baseline, so you
 can see how much each one improves on it.
+
+Note on the output: `greedy` doesn't get its own printed row in that final
+comparison — all five methods are implemented and all five run, but
+`greedy`'s result is what's shown as the "(greedy: ...)" baseline next to
+the other four, and it's also the tour that gets handed to `improvement()`
+to clean up. It's still a complete, independent algorithm (`greedy()` in
+`tsp.py`), just displayed as the point of comparison rather than a row of
+its own.
