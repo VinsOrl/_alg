@@ -1,4 +1,6 @@
-"""Week 10: numerical derivatives/integrals and Monte Carlo integration (numpy only).
+"""This program was written with Claude Code assistance.
+
+Week 10: numerical derivatives/integrals and Monte Carlo integration (numpy only).
 
 Functions take numpy arrays and are vectorised: f(x) works on a scalar/1D array
 for the single-variable helpers, and f(points) with shape (..., n) -> (...) for
@@ -61,16 +63,32 @@ def f(x):
     return np.sum(x ** 2, axis=-1)  # x1^2 + ... + xn^2 (low=0, high=1, see REPORT)
 
 
+def check(name, got, exact, tol):
+    ok = abs(got - exact) < tol
+    print(f"{'OK  ' if ok else 'FAIL'} {name}: {got:.6f} (exact {exact:.6f}, tol {tol:.0e})")
+    assert ok, name
+
+
 def demo():
     np.random.seed(0)
-    print("1D derivative of x^2 at 3 (exact 6):", numeric_derivative(lambda x: x ** 2, 3.0))
-    print("1D integral of x^2 on [0,1] (exact 1/3):", numeric_integral(lambda x: x ** 2, 0, 1))
-    print("1D MC integral, N=100000:", mc_integral_1d(lambda x: x ** 2, 0, 1, 100000))
-    x = np.array([0.5, 1.0, 2.0, -3.0])
-    print("gradient at", x, "->", gradient(f, x), "exact", 2 * x)
-    assert np.allclose(gradient(f, x), 2 * x, atol=1e-6)
-
     N = 100_000
+    se1 = lambda sd, scale=1.0: 3 * scale * sd / np.sqrt(N)  # 3 standard errors
+    sq = lambda x: x ** 2
+    # 1. numeric derivative / integral
+    check("d/dx x^2 at 3", numeric_derivative(sq, 3.0), 6, 1e-3)
+    check("int x^2 on [0,1]", numeric_integral(sq, 0, 1), 1 / 3, 1e-3)
+    check("d/dx sin at 0", numeric_derivative(np.sin, 0.0), 1, 1e-3)
+    check("int sin on [0,pi]", numeric_integral(np.sin, 0, np.pi), 2, 1e-3)
+    # 2. MC single variable (sd of x^2 on [0,1] = sqrt(4/45); of pi*sin on [0,pi] ~ 0.3077*pi)
+    check("MC int x^2 on [0,1]", mc_integral_1d(sq, 0, 1, N), 1 / 3, se1(np.sqrt(4 / 45)))
+    check("MC int sin on [0,pi]", mc_integral_1d(np.sin, 0, np.pi, N), 2, se1(0.3077, np.pi))
+    # 3. gradient
+    g = gradient(f, [1, 2, 3])
+    print("gradient at [1,2,3]:", g, "exact [2 4 6]")
+    assert np.allclose(g, [2, 4, 6], atol=1e-3)
+    # 4. MC 2D
+    check("MC int x^2+y^2 on [0,1]^2", mc_integral(f, [0, 0], [1, 1], N), 2 / 3, se1(np.sqrt(8 / 45)))
+    print("\nItems 5 and 6: Riemann and Monte Carlo by dimension")
     ks = {1: 100_000, 2: 1000, 5: 22, 100: 2}  # 5D: k=20 gives 1.04e-3 error (fails 1e-3 rule), k=22 gives 8.6e-4
     print(f"\n{'dim':>4} {'exact':>9} {'Riemann':>10} {'R err':>9} {'R time':>7} "
           f"{'MC':>10} {'MC err':>9} {'3*SE':>8} {'MC time':>8}")

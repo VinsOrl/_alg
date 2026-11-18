@@ -13,6 +13,10 @@ python3 monte_carlo.py
 
 It prints a table and stops with an assertion error if any result is off.
 
+## AI usage
+
+This program and this README were written with AI assistance (Claude Code).
+
 ## What's in it
 
 | Function | Job |
@@ -26,16 +30,16 @@ It prints a table and stops with an assertion error if any result is off.
 
 ## Test function
 
-f(x) = x1² + … + xn² on the box [0,1]ⁿ. Exact integral = n/3, exact gradient = 2x. The question says "low and high as 1", which would be a zero-size box, so I used low = 0, high = 1.
+f(x) = x1² + … + xn² on the box [0,1]ⁿ. Exact integral = n/3, exact gradient = 2x. The question says "low and high as 1", which would be a zero-size box, so low = 0, high = 1 is used.
 
 ## The answers
 
 | dim | exact | Riemann | Monte Carlo (N = 100,000) |
 |---|---|---|---|
-| 1 | 0.3333 | 0.33333 | 0.33564 |
-| 2 | 0.6667 | 0.66667 | 0.66331 |
-| 5 | 1.6667 | 1.66581 | 1.67165 |
-| 100 | 33.3333 | **infeasible** | 33.32994 |
+| 1 | 0.3333 | 0.33333 | 0.33391 |
+| 2 | 0.6667 | 0.66667 | 0.66854 |
+| 5 | 1.6667 | 1.66581 | 1.66855 |
+| 100 | 33.3333 | **infeasible** | 33.32859 |
 
 ## Why the Riemann sum dies at 100D
 
